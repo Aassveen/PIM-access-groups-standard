@@ -23,18 +23,9 @@ resource "azuread_directory_role_assignment" "pim_assignments" {
   principal_object_id = each.value.object_id
 }
 
-# Make each group eligible for the corresponding role with 8-hour duration
-resource "azuread_directory_role_eligibility_schedule_request" "pim_eligibility" {
-  for_each = azuread_group.pim_groups
-
-  role_definition_id = var.directory_roles[each.key]
-  principal_id       = each.value.object_id
-  directory_scope_id = "/"
-  justification      = "Terraform-managed PIM eligibility for ${each.key} role with 8-hour duration"
-}
-
-# Static time for schedule start
-resource "time_static" "start" {}
+# Note: PIM eligibility schedule requests require RoleEligibilitySchedule.ReadWrite.Directory permission
+# which is not available to regular users. For 8-hour eligibility duration, configure in Azure Portal:
+# Azure AD > Privileged Identity Management > Azure AD roles > [Role] > Settings > Assignment duration
 
 # Create access package catalog
 # resource "azuread_access_package_catalog" "pim_catalog" {
