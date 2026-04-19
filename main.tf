@@ -8,9 +8,9 @@ locals {
 
 # Create PIM groups for each directory role
 resource "azuread_group" "pim_groups" {
-  for_each = toset(var.directory_roles)
+  for_each = var.directory_roles
 
-  display_name       = "PIM-${each.value}-Tilgang"
+  display_name       = "PIM-${each.key}-Tilgang"
   security_enabled   = true
   assignable_to_role = true
 }
@@ -19,7 +19,7 @@ resource "azuread_group" "pim_groups" {
 resource "azuread_directory_role_assignment" "pim_assignments" {
   for_each = azuread_group.pim_groups
 
-  role_id             = local.role_ids[each.key]
+  role_id             = var.directory_roles[each.key]
   principal_object_id = each.value.object_id
 }
 
