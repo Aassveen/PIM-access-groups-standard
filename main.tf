@@ -15,17 +15,19 @@ resource "azuread_group" "pim_groups" {
   assignable_to_role = true
 }
 
-# Assign each role to the corresponding group (permanent assignment for PIM setup)
-resource "azuread_directory_role_assignment" "pim_assignments" {
+# Make each group eligible for the corresponding role (requires Global Admin)
+resource "azuread_directory_role_eligibility_schedule_request" "pim_eligibility" {
   for_each = azuread_group.pim_groups
 
-  role_id             = var.directory_roles[each.key]
-  principal_object_id = each.value.object_id
+  role_definition_id = var.directory_roles[each.key]
+  principal_id       = each.value.object_id
+  directory_scope_id = "/"
+  justification      = "Terraform-managed PIM eligibility for ${each.key} role"
 }
 
-# Note: PIM eligibility schedule requests require RoleEligibilitySchedule.ReadWrite.Directory permission
-# which is not available to regular users. For 8-hour eligibility duration, configure in Azure Portal:
-# Azure AD > Privileged Identity Management > Azure AD roles > [Role] > Settings > Assignment duration
+# Note: To make these eligible (rather than permanent), configure in Azure Portal:
+# Azure AD > Privileged Identity Management > Azure AD roles > [Role] > Assignments > Groups
+# Change from "Active" (permanent) to "Eligible" for each group
 
 # Create access package catalog
 # resource "azuread_access_package_catalog" "pim_catalog" {

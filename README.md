@@ -13,19 +13,20 @@ This Terraform project creates PIM (Privileged Identity Management) groups and s
 
 ## Resources Created
 - Security groups named `PIM-{Role}-Tilgang` for each role, configured as role-assignable
-- Permanent role assignments making each group eligible for its corresponding directory role
-- An access package catalog named "PIM Access Packages"
-- Access packages for each group, allowing self-service requests
-- Assignment policies with self-service access for all directory members
+- PIM eligibility schedules making each group **eligible** (not permanent) for its corresponding directory role
+- Users must activate the role each time they need access
 
-## Configuring 8-Hour Eligibility Duration
-After deployment, configure the 8-hour eligibility duration in the Azure Portal:
+## Post-Deployment Configuration: Set Activation Duration
+
+After deployment, configure the maximum activation duration in Azure Portal:
 
 1. Go to **Azure AD > Privileged Identity Management > Azure AD roles**
 2. Select each role (Global Reader, Global Administrator, etc.)
 3. Click **Settings**
-4. Under **Activation**, set **Maximum activation duration** to 8 hours
-5. Save the settings
+4. Set **Maximum activation duration** to **8 hours** (or your preferred duration)
+5. Save
+
+Now users must activate their eligibility and can hold the role for a maximum of 8 hours per activation.
 
 ## Prerequisites
 - Azure AD tenant with Privileged Role Administrator permissions (for setting eligibility durations)
@@ -51,6 +52,7 @@ After deployment, configure the 8-hour eligibility duration in the Azure Portal:
 - **Alternative**: Configure eligibility durations in Azure Portal after deployment
 
 ## Notes
-- Groups are permanently assigned to roles
-- Users can activate their eligibility through the Azure Portal PIM interface
-- Access packages provide self-service request workflows (when available)
+- Groups are eligible (not permanently assigned) for their roles
+- Users must activate the role in PIM each time they need access
+- Activation duration is configurable (8 hours recommended)
+- This requires Global Admin permissions to deploy
