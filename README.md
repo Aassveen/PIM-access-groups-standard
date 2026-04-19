@@ -14,6 +14,7 @@ This Terraform project creates PIM (Privileged Identity Management) groups and s
 ## Resources Created
 - Security groups named `PIM-{Role}-Tilgang` for each role, configured as role-assignable
 - Permanent role assignments making each group eligible for its corresponding directory role
+- PIM eligibility schedules with 8-hour duration for each group-role combination
 - An access package catalog named "PIM Access Packages"
 - Access packages for each group, allowing self-service requests
 - Assignment policies with self-service access for all directory members
@@ -36,6 +37,6 @@ This Terraform project creates PIM (Privileged Identity Management) groups and s
 3. Push the code: `git push -u origin master`
 
 ## Notes
-- Groups are permanently assigned to roles; PIM is managed at the group membership level
+- Groups are permanently assigned to roles, with additional 8-hour PIM eligibility schedules
 - Users can request access through the access packages in the My Access portal
-- To enable PIM for group memberships, configure PIM settings in Azure portal after deployment
+- Eligibility duration is set to 8 hours; assignment duration is managed by access package policies
