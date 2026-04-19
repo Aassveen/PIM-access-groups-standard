@@ -15,17 +15,15 @@ resource "azuread_group" "pim_groups" {
   assignable_to_role = true
 }
 
-# Make each group eligible for the corresponding role (requires Global Admin)
-resource "azuread_directory_role_eligibility_schedule_request" "pim_eligibility" {
+# Assign each role to the corresponding group (will be converted to eligible in Portal)
+resource "azuread_directory_role_assignment" "pim_assignments" {
   for_each = azuread_group.pim_groups
 
-  role_definition_id = var.directory_roles[each.key]
-  principal_id       = each.value.object_id
-  directory_scope_id = "/"
-  justification      = "Terraform-managed PIM eligibility for ${each.key} role"
+  role_id             = var.directory_roles[each.key]
+  principal_object_id = each.value.object_id
 }
 
-# Note: To make these eligible (rather than permanent), configure in Azure Portal:
+# Note: Convert to eligible roles manually in Azure Portal:
 # Azure AD > Privileged Identity Management > Azure AD roles > [Role] > Assignments > Groups
 # Change from "Active" (permanent) to "Eligible" for each group
 

@@ -13,20 +13,46 @@ This Terraform project creates PIM (Privileged Identity Management) groups and s
 
 ## Resources Created
 - Security groups named `PIM-{Role}-Tilgang` for each role, configured as role-assignable
-- PIM eligibility schedules making each group **eligible** (not permanent) for its corresponding directory role
-- Users must activate the role each time they need access
+- Permanent role assignments to each directory role
+- (These will be converted to **eligible** in the next step)
 
-## Post-Deployment Configuration: Set Activation Duration
+## Post-Deployment: Convert to Eligible Roles
 
-After deployment, configure the maximum activation duration in Azure Portal:
+After running `terraform apply`, groups have **permanent** role assignments. Convert them to **eligible** (requires activation):
 
 1. Go to **Azure AD > Privileged Identity Management > Azure AD roles**
-2. Select each role (Global Reader, Global Administrator, etc.)
-3. Click **Settings**
-4. Set **Maximum activation duration** to **8 hours** (or your preferred duration)
-5. Save
+2. Select the first role (e.g., **Global Reader**)
+3. Go to **Assignments**
+4. Find the group **PIM-Global Reader-Tilgang** and click it
+5. Click **Edit assignment**
+6. Change assignment type from **Active** to **Eligible**
+7. Set **Maximum activation duration** to **8 hours**
+8. Click **Update**
+9. Repeat steps 2-8 for each role
 
-Now users must activate their eligibility and can hold the role for a maximum of 8 hours per activation.
+Alternatively, use Azure CLI (faster for all 7 roles):
+
+```powershell
+# Get your tenant ID
+$tenantId = "1fd7e0f3-8bdd-43e1-b81c-503044f52c8f"
+
+# Get each group ID
+$groups = @{
+  "Global Reader" = "a9907c32-a194-48d9-af1c-faa2d125bcac"
+  "Global Administrator" = "a905574e-35c7-4be1-8bb1-37a1987f51ad"
+  # ... add other group IDs
+}
+
+# For each group, update to eligible
+foreach ($role, $groupId in $groups.GetEnumerator()) {
+  # Use Microsoft Graph API to convert to eligible
+}
+```
+
+## Prerequisites
+- Azure AD tenant with Global Administrator permissions
+- Terraform >= 1.0
+- Azure CLI logged in (`az login`)
 
 ## Prerequisites
 - Azure AD tenant with Privileged Role Administrator permissions (for setting eligibility durations)
